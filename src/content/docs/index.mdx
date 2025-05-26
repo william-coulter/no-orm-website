@@ -1,36 +1,63 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
+title: No ORM
+description: Generate type-safe Slonik / Zod interfaces and access patterns from your PostgreSQL schema.
 template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
+  tagline: All the best parts of an ORM without using an ORM. 
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/logo.webp
   actions:
-    - text: Example Guide
-      link: /guides/example/
-      icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
+    - text: Get started
+      link: /philosophy/example/
       icon: external
-      variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import { Badge, Card, CardGrid } from '@astrojs/starlight/components';
+import ormPhilosophyOverviewSrc from '../../assets/orm-philosophy-overview.webp';
+import noOrmPhilosophyOverviewSrc from '../../assets/no-orm-philosophy-overview.webp';
 
-## Next steps
+# Motivation
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
-</CardGrid>
+**We hate ORMs.**
+
+Well we don't _"hate"_ them, but they have their pros and cons.
+
+ORMs are an **abstraction** over whatever database engine you are using. Abstractions work by hiding implementation details which makes using your database simpler, but also harder to understand and deeply configure. **You gain simplicity but lose control**.
+
+Our opinion is that PostgreSQL is already a great abstraction. It's a centuries-old cathedral: carefully designed, continuously maintained and stands strong thanks to its dedicated community. Adding another layer on top often just obscures the craftsmanship and limits potential.
+
+We recognise however that ORMs do have their benefits.
+
+**The motivation of `No ORM` is to capture all of the best bits of an ORM while also preserving what makes PostgreSQL so great.**
+
+# Philosophy
+
+With a traditional ORM, you start by defining your entities and the ORM will generate your schema.
+
+{/* FIXME: Center these god damn images. */}
+<Image 
+  src={ormPhilosophyOverviewSrc} 
+  alt="ORM philosophy overview diagram." 
+  style={"max-width: 500px"}
+/>
+
+With `No ORM`, you start by defining your schema and **we give you your entities**!
+
+<Image 
+  src={noOrmPhilosophyOverviewSrc} 
+  alt="ORM philosophy overview diagram." 
+  style={"max-width: 500px"}
+/>
+
+This gives you complete control over your schema without having to think _"does my ORM support this?"_ and still hands you all the boiler-plate entities and access patterns.
+
+{/* FIXME: Do I add something like this? */}
+{/* ## Why schema first? */}
+{/* By defining the schema using the ORM's abstraction, you lose so much control over what your schema can do. An ORM is written for your application code so features in PostgreSQL that your application doesn't need to know about but are amazing features to use are left out.
+Starting with your schema first means that you can  */}
+{/* ORM schema abstractions miss features like [deferred constraint triggers](https://www.postgresql.org/docs/9.0/sql-createconstraint.html)... */}
+
+# How it works
+
+{/* STARTHERE: Add penguin example. */}

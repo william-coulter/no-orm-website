@@ -13,7 +13,7 @@ hero:
 ---
 
 import { Image } from 'astro:assets';
-import { Badge, Card, CardGrid } from '@astrojs/starlight/components';
+import { Badge, Card, CardGrid, Code } from '@astrojs/starlight/components';
 import ormPhilosophyOverviewSrc from '../../assets/orm-philosophy-overview.webp';
 import noOrmPhilosophyOverviewSrc from '../../assets/no-orm-philosophy-overview.webp';
 
@@ -60,4 +60,172 @@ Starting with your schema first means that you can  */}
 
 # How it works
 
-{/* STARTHERE: Add penguin example. */}
+Imagine you had a schema describing penguins and their attempts to join their fellow birds in flight:
+
+```sql
+CREATE TABLE penguins (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  species TEXT NOT NULL,
+  waddle_speed_kph NUMERIC
+);
+
+CREATE TYPE flight_technique AS ENUM (
+  'ski_jump',
+  'hang_glider',
+  'catapult'
+);
+
+CREATE TABLE flight_attempts (
+  id SERIAL PRIMARY KEY,
+  penguin INTEGER NOT NULL REFERENCES penguins(id),
+  technique flight_technique NOT NULL,
+  altitude_m INTEGER NOT NULL,
+  success BOOLEAN NOT NULL,
+  failure_reason TEXT,
+  attempted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+
+  CHECK (
+    success = TRUE OR failure_reason IS NOT NULL
+  )
+);
+
+CREATE INDEX ON flight_attempts (penguin_id);
+```
+
+Running `No ORM` on this schema produces some useful code.
+
+```bash
+npm no-orm --database-url <URL> --config <PATH_TO_CONFIG>
+```
+
+We can see files called `table.ts` which describe our Postgres table in Typescript.
+
+```typescript
+// no-orm/public/penguins/table.ts
+import { z } from "zod";
+import { sql } from "slonik";
+
+export const row = z.object({
+  id: z.number().brand<"public.penguins">(),
+  name: z.string(),
+  species: z.string(),
+  waddle_speed_kph: z.number(),
+});
+
+export type Row = z.infer<typeof row>;
+
+export type Id = Row["id"];
+
+export type Create = {
+  name: string;
+  species: string;
+  waddle_speed_kph: number;
+}
+
+export type Update = {
+  name: string;
+  species: string;
+  waddle_speed_kph: number;
+}
+
+export const tableFragment = sql.identifier(["public", "penguins"]);
+
+export const columns = Object.keys(row.shape).map((col) =>
+  sql.identifier([col]),
+);
+
+export const columnsFragment = sql.join(columns, sql.fragment`, `);
+
+```
+
+{/* TODO: Make this tabulated with the above example? There is a `Tab` compoonent. I should use `code` component as well.*/}
+And we also get some **accompanying** functions that help us access this table in `model.ts`:
+
+```typescript
+// no-orm/public/penguins/model.ts
+import { CommonQueryMethods, sql } from "slonik";
+import { columnsFragment, Id, row, Row, Shape, tableFragment } from "./table";
+
+type GetArgs = BaseArgs & {
+  id: Id;
+};
+
+// STARTHERE: Do the `getMany` pattern and have this call that.
+/**
+ * Given a verified id will return a `Row`.
+ */
+export function get({ connection, id }: GetArgs): Promise<Row> {
+  const query = sql.type(row)`
+    SELECT ${columnsFragment} 
+    FROM ${tableFragment}
+    WHERE id = ${id}`;
+
+  return connection.one(query);
+}
+
+type CreateArgs = BaseArgs & {
+  shape: Shape;
+};
+
+export function create({ connection, shape }: CreateArgs): Promise<Row> {
+  const query = sql.type(row)`
+    INSERT INTO ${tableFragment} (
+      job
+    ) VALUES (
+      ${shape.job}
+    )
+    RETURNING ${columnsFragment}`;
+
+  return connection.one(query);
+}
+
+type UpdateArgs = BaseArgs & {
+  newRow: Row;
+};
+
+export function update({ connection, newRow }: UpdateArgs): Promise<Row> {
+  const query = sql.type(row)`
+    UPDATE ${tableFragment} SET
+      job = ${newRow.job},
+      patch = ${newRow.patch},
+      scraped_patch = ${newRow.scraped_patch},
+      scraped_lolalytics = ${newRow.scraped_lolalytics},
+      scraped_gol = ${newRow.scraped_gol},
+      processed_data = ${newRow.processed_data}
+    WHERE id = ${newRow.id}
+    RETURNING ${columnsFragment}`;
+
+  return connection.one(query);
+}
+
+type FindByJobArgs = BaseArgs & {
+  job: JobId;
+};
+
+export function findByJob({
+  connection,
+  job,
+}: FindByJobArgs): Promise<Row | null> {
+  const query = sql.type(row)`
+    SELECT ${columnsFragment} 
+    FROM ${tableFragment}
+    WHERE job = ${job}`;
+
+  return connection.maybeOne(query);
+}
+
+type BaseArgs = { connection: CommonQueryMethods };
+
+```
+
+{/* TODO: Next table */}
+{/* const flightTechnique = z.union([
+  z.literal("ski_jump"),
+  z.literal("hang_glider"),
+  z.literal("catapult"),
+]);
+
+export type flightTechnique = z.infer<typeof flightTechnique>; */}
+
+{/* TODO: Full API example, once this is built. */}

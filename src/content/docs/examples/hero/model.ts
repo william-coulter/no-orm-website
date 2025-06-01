@@ -5,46 +5,71 @@ import {
   type Id,
   row,
   type Row,
-  type Create,
   tableFragment,
 } from "./table";
+
+export type CreateManyArgs = BaseArgs & {
+  shapes: Create[];
+};
+
+export async function createMany({
+  connection,
+  shapes,
+}: CreateManyArgs): Promise<readonly Row[]> {
+  const names = shapes.map((shape) => shape.name);
+  const species = shapes.map((shape) => shape.species);
+  const waddleSpeeds = shapes.map((shape) => shape.waddle_speed_kph);
+
+  const query = sql.type(row)`
+    INSERT INTO ${tableFragment} (
+      name,
+      species,
+      waddle_speed_kph
+    )
+    SELECT ${columnsFragment} FROM ${sql.unnest(
+      [names, species, waddleSpeeds],
+      ["text", "text", "numeric"],
+    )}
+    RETURNING ${columnsFragment}`;
+
+  return connection.any(query);
+}
+
+export type CreateArgs = BaseArgs & {
+  shape: Create;
+};
+
+export async function create({ connection, shape }: CreateArgs): Promise<Row> {
+  const result = await createMany({ connection, shapes: [shape] });
+  return result[0];
+}
+
+export type GetManyArgs = BaseArgs & {
+  ids: number[];
+};
+
+export async function getMany({
+  connection,
+  ids,
+}: GetManyArgs): Promise<readonly Row[]> {
+  const query = sql.type(row)`
+    SELECT ${columnsFragment}
+    FROM ${tableFragment}
+    WHERE id = ANY(${sql.array(ids, "INT")})`;
+
+  return connection.any(query);
+}
 
 type GetArgs = BaseArgs & {
   id: Id;
 };
 
-// TODO: Do the `getMany` pattern and have this call that.
-/**
- * Given a verified id will return a `Row`.
- */
-export function get({ connection, id }: GetArgs): Promise<Row> {
-  const query = sql.type(row)`
-    SELECT ${columnsFragment} 
-    FROM ${tableFragment}
-    WHERE id = ${id}`;
-
-  return connection.one(query);
+export async function get({ connection, id }: GetArgs): Promise<Row> {
+  const result = await getMany({ connection, ids: [id] });
+  return result[0];
 }
 
-type CreateArgs = BaseArgs & {
-  shape: Create;
-};
-
-export function create({ connection, shape }: CreateArgs): Promise<Row> {
-  const query = sql.type(row)`
-    INSERT INTO ${tableFragment} (
-      job
-    ) VALUES (
-      ${shape.name}
-    )
-    RETURNING ${columnsFragment}`;
-
-  return connection.one(query);
-}
-
-type UpdateArgs = BaseArgs & {
-  newRow: Row;
-};
+// STARTHERE: Do an update many.
 
 export function update({ connection, newRow }: UpdateArgs): Promise<Row> {
   const query = sql.type(row)`
@@ -60,6 +85,22 @@ export function update({ connection, newRow }: UpdateArgs): Promise<Row> {
 
   return connection.one(query);
 }
+
+export type Create = {
+  name: string;
+  species: string;
+  waddle_speed_kph: number;
+};
+
+export type Update = {
+  name: string;
+  species: string;
+  waddle_speed_kph: number;
+};
+
+type UpdateArgs = BaseArgs & {
+  newRow: Row;
+};
 
 type FindByJobArgs = BaseArgs & {
   job: JobId;

@@ -16,6 +16,7 @@
     "starlight-theme-rapide": "^0.5.1"
   },
   "devDependencies": {
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "slonik": "^47.3.2"
   }
 }

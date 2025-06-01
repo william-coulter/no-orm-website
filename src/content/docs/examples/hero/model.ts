@@ -1,6 +1,13 @@
 // TODO: Finish me.
-import { CommonQueryMethods, sql } from "slonik";
-import { columnsFragment, Id, row, Row, Shape, tableFragment } from "./table";
+import { type CommonQueryMethods, sql } from "slonik";
+import {
+  columnsFragment,
+  type Id,
+  row,
+  type Row,
+  type Create,
+  tableFragment,
+} from "./table";
 
 type GetArgs = BaseArgs & {
   id: Id;
@@ -20,7 +27,7 @@ export function get({ connection, id }: GetArgs): Promise<Row> {
 }
 
 type CreateArgs = BaseArgs & {
-  shape: Shape;
+  shape: Create;
 };
 
 export function create({ connection, shape }: CreateArgs): Promise<Row> {
@@ -28,7 +35,7 @@ export function create({ connection, shape }: CreateArgs): Promise<Row> {
     INSERT INTO ${tableFragment} (
       job
     ) VALUES (
-      ${shape.job}
+      ${shape.name}
     )
     RETURNING ${columnsFragment}`;
 

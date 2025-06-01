@@ -13,9 +13,12 @@ hero:
 ---
 
 import { Image } from 'astro:assets';
-import { Badge, Card, CardGrid, Code } from '@astrojs/starlight/components';
+import { Badge, Card, CardGrid, Code, Tabs, TabItem } from '@astrojs/starlight/components';
 import ormPhilosophyOverviewSrc from '../../assets/orm-philosophy-overview.webp';
 import noOrmPhilosophyOverviewSrc from '../../assets/no-orm-philosophy-overview.webp';
+import penguinsSql from "./examples/hero/penguins.sql?raw";
+import tableTs from "./examples/hero/table.ts?raw";
+import modelTs from "./examples/hero/model.ts?raw";
 
 # Motivation
 
@@ -52,180 +55,33 @@ With `No ORM`, you start by defining your schema and **we give you your entities
 
 This gives you complete control over your schema without having to think _"does my ORM support this?"_ and still hands you all the boiler-plate entities and access patterns.
 
-{/* FIXME: Do I add something like this? */}
+{/* TODO: Do I add something like this? */}
 {/* ## Why schema first? */}
 {/* By defining the schema using the ORM's abstraction, you lose so much control over what your schema can do. An ORM is written for your application code so features in PostgreSQL that your application doesn't need to know about but are amazing features to use are left out.
 Starting with your schema first means that you can  */}
 {/* ORM schema abstractions miss features like [deferred constraint triggers](https://www.postgresql.org/docs/9.0/sql-createconstraint.html)... */}
 
-# How it works
+# See it in action
 
-Imagine you had a schema describing penguins and their attempts to join their fellow birds in flight:
+Imagine you had a schema describing penguins and their attempts to join their fellow birds in flight.
 
-```sql
-CREATE TABLE penguins (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  species TEXT NOT NULL,
-  waddle_speed_kph NUMERIC
-);
-
-CREATE TYPE flight_technique AS ENUM (
-  'ski_jump',
-  'hang_glider',
-  'catapult'
-);
-
-CREATE TABLE flight_attempts (
-  id SERIAL PRIMARY KEY,
-  penguin INTEGER NOT NULL REFERENCES penguins(id),
-  technique flight_technique NOT NULL,
-  altitude_m INTEGER NOT NULL,
-  success BOOLEAN NOT NULL,
-  failure_reason TEXT,
-  attempted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-
-  CHECK (
-    success = TRUE OR failure_reason IS NOT NULL
-  )
-);
-
-CREATE INDEX ON flight_attempts (penguin_id);
-```
-
-Running `No ORM` on this schema produces some useful code.
+<Code code={penguinsSql} lang="sql" title="penguins.sql" />
 
 ```bash
-npm no-orm --database-url <URL> --config <PATH_TO_CONFIG>
+npm no-orm --config <PATH_TO_CONFIG>
 ```
 
-We can see files called `table.ts` which describe our Postgres table in Typescript.
+Running `no-orm` on a database with this schema applied will produce the following:
 
-```typescript
-// no-orm/public/penguins/table.ts
-import { z } from "zod";
-import { sql } from "slonik";
+<Tabs>
+  <TabItem label="entities"><Code code={tableTs} lang="typescript" title="no-orm/public/penguins/table.ts" /></TabItem>
+  <TabItem label="access patterns"><Code code={modelTs} lang="typescript" title="no-orm/public/penguins/model.ts" /></TabItem>
+</Tabs>
 
-export const row = z.object({
-  id: z.number().brand<"public.penguins">(),
-  name: z.string(),
-  species: z.string(),
-  waddle_speed_kph: z.number(),
-});
+These helpers can then be used to easily in your server code:
 
-export type Row = z.infer<typeof row>;
+{/* TODO: API example. */}
 
-export type Id = Row["id"];
-
-export type Create = {
-  name: string;
-  species: string;
-  waddle_speed_kph: number;
-}
-
-export type Update = {
-  name: string;
-  species: string;
-  waddle_speed_kph: number;
-}
-
-export const tableFragment = sql.identifier(["public", "penguins"]);
-
-export const columns = Object.keys(row.shape).map((col) =>
-  sql.identifier([col]),
-);
-
-export const columnsFragment = sql.join(columns, sql.fragment`, `);
-
-```
-
-{/* TODO: Make this tabulated with the above example? There is a `Tab` compoonent. I should use `code` component as well.*/}
-And we also get some **accompanying** functions that help us access this table in `model.ts`:
-
-```typescript
-// no-orm/public/penguins/model.ts
-import { CommonQueryMethods, sql } from "slonik";
-import { columnsFragment, Id, row, Row, Shape, tableFragment } from "./table";
-
-type GetArgs = BaseArgs & {
-  id: Id;
-};
-
-// STARTHERE: Do the `getMany` pattern and have this call that.
-/**
- * Given a verified id will return a `Row`.
- */
-export function get({ connection, id }: GetArgs): Promise<Row> {
-  const query = sql.type(row)`
-    SELECT ${columnsFragment} 
-    FROM ${tableFragment}
-    WHERE id = ${id}`;
-
-  return connection.one(query);
-}
-
-type CreateArgs = BaseArgs & {
-  shape: Shape;
-};
-
-export function create({ connection, shape }: CreateArgs): Promise<Row> {
-  const query = sql.type(row)`
-    INSERT INTO ${tableFragment} (
-      job
-    ) VALUES (
-      ${shape.job}
-    )
-    RETURNING ${columnsFragment}`;
-
-  return connection.one(query);
-}
-
-type UpdateArgs = BaseArgs & {
-  newRow: Row;
-};
-
-export function update({ connection, newRow }: UpdateArgs): Promise<Row> {
-  const query = sql.type(row)`
-    UPDATE ${tableFragment} SET
-      job = ${newRow.job},
-      patch = ${newRow.patch},
-      scraped_patch = ${newRow.scraped_patch},
-      scraped_lolalytics = ${newRow.scraped_lolalytics},
-      scraped_gol = ${newRow.scraped_gol},
-      processed_data = ${newRow.processed_data}
-    WHERE id = ${newRow.id}
-    RETURNING ${columnsFragment}`;
-
-  return connection.one(query);
-}
-
-type FindByJobArgs = BaseArgs & {
-  job: JobId;
-};
-
-export function findByJob({
-  connection,
-  job,
-}: FindByJobArgs): Promise<Row | null> {
-  const query = sql.type(row)`
-    SELECT ${columnsFragment} 
-    FROM ${tableFragment}
-    WHERE job = ${job}`;
-
-  return connection.maybeOne(query);
-}
-
-type BaseArgs = { connection: CommonQueryMethods };
-
-```
-
-{/* TODO: Next table */}
-{/* const flightTechnique = z.union([
-  z.literal("ski_jump"),
-  z.literal("hang_glider"),
-  z.literal("catapult"),
-]);
-
-export type flightTechnique = z.infer<typeof flightTechnique>; */}
+We get full flexibility over the database schema, boilerplate types representing data in your tables and helpful access patterns - all with **no ORM!**
 
 {/* TODO: Full API example, once this is built. */}

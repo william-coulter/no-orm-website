@@ -1,4 +1,3 @@
-// TODO: Finish me.
 import { type CommonQueryMethods, sql } from "slonik";
 import {
   columnsFragment,

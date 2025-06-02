@@ -1,0 +1,61 @@
+---
+title: Welcome to No ORM
+description: A guide on how to get started with No ORM.
+---
+import { Code } from "@astrojs/starlight/components"
+
+import penguinsSql from "../examples/hero/penguins.sql?raw";
+
+Like what you've seen so far?
+
+This guide will show you how you can get started with `no-orm` as quickly as possible!
+
+## Installation
+
+Since `no-orm` is a code-generator tool, we install `no-orm` as a dev-dependency.
+
+```bash
+npm install --save-dev no-orm
+```
+
+It is crucial however that you install these peer-dependencies.
+
+```bash
+npm install --save slonik zod
+```
+
+## Initialise your config file
+
+Here is a minimal config file:
+
+```typescript title=no-orm-config.ts
+import { Config } from "no-orm";
+
+export const config: Config = {
+  database_url: "postgres://postgres:postgres@localhost:5432/postgres",
+};
+```
+
+See the full reference here. (TODO).
+
+## Your first auto-generated code
+
+Apply the following schema to your database:
+
+<Code code={penguinsSql} lang="sql" title="penguins.sql" />
+
+Run `no-orm`!
+
+```bash
+npx no-orm
+```
+
+{/* Some thoughts:
+- The `table.ts` file.
+- The `model.ts file.
+- Indexes.
+- Best practices.
+  - Don't commit your generated files (hash?).
+  - Don't write JOINs (expand).
+- "The config file" reference. 
+*/}

@@ -5,6 +5,7 @@ CREATE TABLE penguins (
   waddle_speed_kph NUMERIC
 );
 
+-- TODO: Move me out of this schema and into another example.
 CREATE TYPE flight_technique AS ENUM (
   'ski_jump',
   'hang_glider',

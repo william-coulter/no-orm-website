@@ -8,6 +8,14 @@ import {
   tableFragment,
 } from "./table";
 
+type BaseArgs = { connection: CommonQueryMethods };
+
+export type Create = {
+  name: string;
+  species: string;
+  waddle_speed_kph: number;
+};
+
 export type CreateManyArgs = BaseArgs & {
   shapes: Create[];
 };
@@ -69,53 +77,43 @@ export async function get({ connection, id }: GetArgs): Promise<Row> {
   return result[0];
 }
 
-// STARTHERE: Do an update many.
-
-export function update({ connection, newRow }: UpdateArgs): Promise<Row> {
-  const query = sql.type(row)`
-    UPDATE ${tableFragment} SET
-      job = ${newRow.job},
-      patch = ${newRow.patch},
-      scraped_patch = ${newRow.scraped_patch},
-      scraped_lolalytics = ${newRow.scraped_lolalytics},
-      scraped_gol = ${newRow.scraped_gol},
-      processed_data = ${newRow.processed_data}
-    WHERE id = ${newRow.id}
-    RETURNING ${columnsFragment}`;
-
-  return connection.one(query);
-}
-
-export type Create = {
-  name: string;
-  species: string;
-  waddle_speed_kph: number;
-};
-
-export type Update = {
-  name: string;
-  species: string;
-  waddle_speed_kph: number;
-};
+type Update = Row;
 
 type UpdateArgs = BaseArgs & {
-  newRow: Row;
+  newRow: Update;
 };
 
-type FindByJobArgs = BaseArgs & {
-  job: JobId;
-};
-
-export function findByJob({
+export function updateMany({
   connection,
-  job,
-}: FindByJobArgs): Promise<Row | null> {
-  const query = sql.type(row)`
-    SELECT ${columnsFragment} 
-    FROM ${tableFragment}
-    WHERE job = ${job}`;
+  newRows,
+}: UpdateManyArgs): Promise<readonly Row[]> {
+  const ids = newRows.map((row) => row.id);
+  const names = newRows.map((row) => row.name);
+  const species = newRows.map((row) => row.species);
+  const waddleSpeeds = newRows.map((row) => row.waddle_speed_kph);
 
-  return connection.maybeOne(query);
+  const query = sql.type(row)`
+    UPDATE ${tableFragment} AS t SET
+      name = u.name,
+      species = u.species,
+      waddle_speed_kph = u.waddle_speed_kph
+    FROM (
+      SELECT * FROM ${sql.unnest(
+        [ids, names, species, waddleSpeeds],
+        ["id", "text", "text", "numeric"],
+      )}
+    ) AS u(id, name, species, waddle_speed_kph)
+    WHERE t.id = u.id
+    RETURNING ${columnsFragment}`;
+
+  return connection.any(query);
 }
 
-type BaseArgs = { connection: CommonQueryMethods };
+export async function update({ connection, newRow }: UpdateArgs): Promise<Row> {
+  const result = await updateMany({ connection, newRows: [newRow] });
+  return result[0];
+}
+
+export type UpdateManyArgs = BaseArgs & {
+  newRows: Update[];
+};

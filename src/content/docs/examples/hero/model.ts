@@ -117,3 +117,27 @@ export async function update({ connection, newRow }: UpdateArgs): Promise<Row> {
 export type UpdateManyArgs = BaseArgs & {
   newRows: Update[];
 };
+
+export type DeleteManyArgs = BaseArgs & {
+  ids: number[];
+};
+
+export async function deleteMany({
+  connection,
+  ids,
+}: GetManyArgs): Promise<void> {
+  const query = sql.type(row)`
+    DELETE FROM ${columnsFragment}
+    WHERE id = ANY(${sql.array(ids, "INT")})`;
+
+  await connection.query(query);
+}
+
+type DeleteArgs = BaseArgs & {
+  id: Id;
+};
+
+// Gross that I need to add "One" here because delete is a reserved word.
+export async function deleteOne({ connection, id }: DeleteArgs): Promise<void> {
+  await deleteMany({ connection, ids: [id] });
+}

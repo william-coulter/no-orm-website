@@ -27,6 +27,39 @@ import penguinsSql from "./examples/hero/penguins.sql?raw";
 import tableTs from "./examples/hero/table.ts?raw";
 import modelTs from "./examples/hero/model.ts?raw";
 
+# No ORM in 3 steps
+
+1. Define your Postgres schema.
+
+<Code code={penguinsSql} lang="sql" />
+
+2. Run `no-orm` against your database.
+
+```bash frame="none"
+npm no-orm --config no-orm.config.ts
+```
+
+3. Enjoy generated code in your Typescript server!
+
+{/* FIXME: Give these a max-height so that they scroll. */}
+<Tabs>
+  <TabItem label="Useful types">
+    <Code
+      code={tableTs}
+      lang="typescript"
+      title="no-orm/public/penguins/table.ts"
+
+    />
+  </TabItem>
+  <TabItem label="Boilerplate CRUD operations">
+    <Code
+      code={modelTs}
+      lang="typescript"
+      title="no-orm/public/penguins/model.ts"
+    />
+  </TabItem>
+</Tabs>
+
 # Motivation
 
 **We hate ORMs.**

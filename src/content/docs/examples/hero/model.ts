@@ -78,8 +78,8 @@ export async function get({ connection, id }: GetArgs): Promise<Row> {
 
 type Update = Row;
 
-type UpdateArgs = BaseArgs & {
-  newRow: Update;
+export type UpdateManyArgs = BaseArgs & {
+  newRows: Update[];
 };
 
 export function updateMany({
@@ -108,14 +108,14 @@ export function updateMany({
   return connection.any(query);
 }
 
+type UpdateArgs = BaseArgs & {
+  newRow: Update;
+};
+
 export async function update({ connection, newRow }: UpdateArgs): Promise<Row> {
   const result = await updateMany({ connection, newRows: [newRow] });
   return result[0];
 }
-
-export type UpdateManyArgs = BaseArgs & {
-  newRows: Update[];
-};
 
 export type DeleteManyArgs = BaseArgs & {
   ids: number[];

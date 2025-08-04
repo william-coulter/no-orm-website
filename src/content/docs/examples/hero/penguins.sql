@@ -2,28 +2,7 @@ CREATE TABLE penguins (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   species TEXT NOT NULL,
-  waddle_speed_kph NUMERIC
+  waddle_speed_kph NUMERIC NOT NULL,
+  favourite_snack TEXT, -- Optional: not all penguins have refined palates.
+  date_of_birth TIMESTAMP WITH TIME ZONE NOT NULL
 );
-
--- TODO: Move me out of this schema and into another example.
-CREATE TYPE flight_technique AS ENUM (
-  'ski_jump',
-  'hang_glider',
-  'catapult'
-);
-
-CREATE TABLE flight_attempts (
-  id SERIAL PRIMARY KEY,
-  penguin INTEGER NOT NULL REFERENCES penguins(id),
-  technique flight_technique NOT NULL,
-  altitude_m INTEGER NOT NULL,
-  success BOOLEAN NOT NULL,
-  failure_reason TEXT,
-  attempted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-
-  CHECK (
-    success = TRUE OR failure_reason IS NOT NULL
-  )
-);
-
-CREATE INDEX ON flight_attempts (penguin_id);

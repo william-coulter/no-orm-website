@@ -62,39 +62,55 @@ npm no-orm --config no-orm.config.ts
 
 # Motivation
 
-**We hate ORMs.**
+At No ORM, we believe you should be able to build a server without having to learn an ORM abstraction.
 
-Well we don't _"hate"_ them, but they have their pros and cons.
+Abstractions work by hiding implementation details which makes using your database simpler, but also harder to understand and deeply configure. **You gain simplicity but lose control**.
 
-ORMs are an **abstraction** over whatever database engine you are using. Abstractions work by hiding implementation details which makes using your database simpler, but also harder to understand and deeply configure. **You gain simplicity but lose control**.
+Our opinion is that PostgreSQL is already a great abstraction. Adding another layer on top often just obscures what your database is doing and increasing the likelihood to make poor database design decisions.
 
-Our opinion is that PostgreSQL is already a great abstraction. It's a centuries-old cathedral: carefully designed, continuously maintained and stands strong thanks to its dedicated community. Adding another layer on top often just obscures the craftsmanship and limits potential.
-
-We recognise however that ORMs do have their benefits.
-
-**The motivation of `No ORM` is to capture all of the best bits of an ORM while also preserving what makes PostgreSQL so great.**
+We recognise however that ORMs do have their benefits however, so **the motivation of `No ORM` is to capture all of the best bits of an ORM while also preserving what makes PostgreSQL so great.**
 
 # Philosophy
 
+We believe in a **schema-first approach to server design**.
+
 With a traditional ORM, you start by defining your entities and the ORM will generate your schema.
 
-{/* FIXME: Center these god damn images. */}
-
-<Image
-  src={ormPhilosophyOverviewSrc}
-  alt="ORM philosophy overview diagram."
-  style={"max-width: 500px"}
-/>
+<div style="display:flex; justify-content:center;">
+  <Image
+    src={ormPhilosophyOverviewSrc}
+    alt="ORM philosophy overview diagram."
+    style={"max-width: 500px"}
+  />
+</div>
 
 With `No ORM`, you start by defining your schema and **we give you your entities**!
 
-<Image
-  src={noOrmPhilosophyOverviewSrc}
-  alt="ORM philosophy overview diagram."
-  style={"max-width: 500px"}
-/>
+<div style="display:flex; justify-content:center;">
+  <Image
+    src={noOrmPhilosophyOverviewSrc}
+    alt="ORM philosophy overview diagram."
+    style={"max-width: 500px"}
+  />
+</div>
 
-This gives you complete control over your schema without having to think _"does my ORM support this?"_ and still hands you all the boiler-plate entities and access patterns.
+# Why schema-first?
+
+Most applications are **CRUD operations combined in a way to solve a problem** (not to be taken as a critique). Therefore, since less code is easier to maintain, we should try to minimise any additional code written outside of these operations.
+
+This additional code can come in the form of critical business logic, but it can also come in the form of tech-debt masking poor database design.
+
+A schema-first approach means that you can design your database without wading through ORM abstractions, helping you achieve your goal of reducing complexity and **building maintainable software**.
+
+# It's not for everyone
+
+You might love your ORM for various reasons.
+
+Maybe you're not familiar with SQL and prefer the abstraction. Maybe you believe your ORM provides you with useful features that raw Postgres doesn't. Maybe your ORM is so coupled with the framework you are using that it's impractical to use anything else.
+
+That is completely understandable and if so, this tool **probably isn't for you**!
+
+{/* This gives you complete control over your schema without having to think _"does my ORM support this?"_ and still hands you all the boiler-plate entities and access patterns. */}
 
 {/* TODO: Do I add something like this? */}
 {/* ## Why schema first? */}
@@ -102,39 +118,5 @@ This gives you complete control over your schema without having to think _"does 
 Starting with your schema first means that you can _/}
 {/* ORM schema abstractions miss features like [deferred constraint triggers](https://www.postgresql.org/docs/9.0/sql-createconstraint.html)... */}
 
-# See it in action
-
-Imagine you had a schema describing penguins and their attempts to join their fellow birds in flight.
-
-<Code code={penguinsSql} lang="sql" title="penguins.sql" />
-
-```bash
-npm no-orm --config <PATH_TO_CONFIG>
-```
-
-Running `no-orm` on a database with this schema applied will produce the following:
-
-<Tabs>
-  <TabItem label="entities">
-    <Code
-      code={tableTs}
-      lang="typescript"
-      title="no-orm/public/penguins/table.ts"
-    />
-  </TabItem>
-  <TabItem label="access patterns">
-    <Code
-      code={modelTs}
-      lang="typescript"
-      title="no-orm/public/penguins/model.ts"
-    />
-  </TabItem>
-</Tabs>
-
-These helpers can then be used to easily in your server code:
-
-{/* TODO: API example. */}
-
-We get full flexibility over the database schema, boilerplate types representing data in your tables and helpful access patterns - all with **no ORM!**
-
+{/* TODO: Like what you see? Get started link. */}
 {/* TODO: Full API example, once this is built. */}

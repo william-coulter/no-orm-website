@@ -4,7 +4,8 @@ description: A guide on how to get started with No ORM.
 ---
 import { Code } from "@astrojs/starlight/components"
 
-import penguinsSql from "../../code-examples/hero/penguins.sql?raw";
+import heroSql from "../../code-examples/hero/penguins.sql?raw";
+import heroTableTs from "../../code-examples/hero/table.ts?raw";
 
 Like what you've seen so far?
 
@@ -15,40 +16,40 @@ This guide will show you how you can get started with `no-orm` as quickly as pos
 Since `no-orm` is a code-generator tool, we install `no-orm` as a dev-dependency.
 
 ```bash
-npm install --save-dev no-orm
+npm install -D no-orm
 ```
 
-It is crucial however that you install these peer-dependencies.
+You should be prompted to install some peer-dependencies.
 
 ```bash
-npm install --save slonik zod
+npm install slonik zod postgres-range postgres-interval
 ```
 
-## Initialise your config file
+## Initialise no-orm
 
-Here is a minimal config file:
-
-```typescript title=no-orm-config.ts
-import { Config } from "no-orm";
-
-export const config: Config = {
-  database_url: "postgres://postgres:postgres@localhost:5432/postgres",
-};
+```bash
+npx no-orm init
 ```
 
-See the full reference here. (TODO).
+This creates a config file for `no-orm`. Point this to your local database.
+
+See the full config file reference here. (TODO: Add link).
 
 ## Your first auto-generated code
 
 Apply the following schema to your database:
 
-<Code code={penguinsSql} lang="sql" title="penguins.sql" />
+<Code code={heroSql} lang="sql" title="penguins.sql" />
 
 Run `no-orm`!
 
 ```bash
-npx no-orm
+npx no-orm generate --config-path no-orm.config.ts
 ```
+
+And voilà! You can now easily create, read, update and delete a penguin in your Typescript server!
+
+<Code code={heroTableTs} lang="typescript" title="table.ts" />
 
 {/* Some thoughts:
 - The `table.ts` file.

@@ -7,9 +7,7 @@ import { Code } from "@astrojs/starlight/components"
 import heroSql from "../../code-examples/hero/penguins.sql?raw";
 import heroTableTs from "../../code-examples/hero/table.ts?raw";
 
-Like what you've seen so far?
-
-This guide will show you how you can get started with `no-orm` as quickly as possible!
+This guide will show you how you can get started with `no-orm` as quickly as possible.
 
 ## Installation
 
@@ -49,14 +47,5 @@ npx no-orm generate --config-path no-orm.config.ts
 
 And voilà! You can now easily create, read, update and delete a penguin in your Typescript server!
 
-<Code code={heroTableTs} lang="typescript" title="table.ts" />
+<Code code={heroTableTs} lang="typescript" title="table.ts"/>
 
-{/* Some thoughts:
-- The `table.ts` file.
-- The `model.ts file.
-- Indexes.
-- Best practices.
-  - Don't commit your generated files (hash?).
-  - Don't write JOINs (expand).
-- "The config file" reference. 
-*/}

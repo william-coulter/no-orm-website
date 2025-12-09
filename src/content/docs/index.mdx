@@ -18,6 +18,7 @@ import {
   Card,
   CardGrid,
   Code,
+  LinkButton,
   Tabs,
   TabItem,
 } from "@astrojs/starlight/components";
@@ -28,24 +29,30 @@ import tableTs from "../code-examples/hero/table.ts?raw";
 
 # No ORM in 3 steps
 
-1. Define your Postgres schema.
+## 1. Define your Postgres schema.
 
 <Code code={penguinsSql} lang="sql" />
 
-2. Run `no-orm` against your database.
+## 2. Run `no-orm` against your database.
 
 ```bash frame="none"
 npx no-orm --config no-orm.config.ts
 ```
 
-3. Enjoy generated code in your Typescript server!
+## 3. Enjoy generated code in your Typescript server!
 
-{/* FIXME: Give these a max-height so that they scroll. */}
+{/* TODO: Give these a max-height so that they scroll. */}
 <Code
   code={tableTs}
   lang="typescript"
   title="no-orm/public/tables/penguins.ts"
 />
+
+## Like what you see?
+
+<LinkButton href="/get-started/" icon="external">Get started</LinkButton>
+
+Or... Keep reading!
 
 # Motivation
 

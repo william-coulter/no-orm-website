@@ -56,6 +56,7 @@ export default defineConfig({
         },
         {
           // Talk about a recommended deploy pipeline (example server).
+          // Don't commit your no-orm code. It should be generated against your production DB.
           label: "Using in production",
           autogenerate: { directory: "using-in-production" },
         },

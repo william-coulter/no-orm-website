@@ -1,0 +1,42 @@
+---
+title: Output directory structure
+description: Learn a bit about branding and why it is useful.
+sidebar:
+  order: 1
+---
+
+import { FileTree } from '@astrojs/starlight/components';
+
+When you run `no-orm generate`, the outputted files will follow this file structure:
+
+## Generated output structure
+
+<FileTree>
+
+- no-orm
+  - public A directory for each `schema` in your database.
+    - **tables** A list of `tables` defined in your schema.
+      - penguins.ts The heart of `no-orm`.
+      - flight_attempts.ts Contains types and CRUD methods.
+      - ... other tables
+    - domains Postgres `domains` defined in your schema.
+      - schemas.ts
+      - types.ts
+    - enums Postgres `enums` defined in your schema.
+      - schemas.ts
+      - types.ts
+    - ranges Postgres `ranges` defined in your schema.
+      - schemas.ts
+      - types.ts
+  - postgres General helpers relating to your database.
+    - schemas.ts
+    - serializers.ts
+    - types.ts
+  - slonik General helpers relating to your Slonik setup.
+    - type-parsers.ts
+  - .../ Other schemas
+</FileTree>
+
+To see exactly what is in these files, run `no-orm` and poke around.
+
+The rest of the basics will cover what is in the `table` modules.

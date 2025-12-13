@@ -22,9 +22,6 @@ export default defineConfig({
           autogenerate: { directory: "get-started" },
         },
         {
-          // Go over the CRUD methods.
-          // There is always a "many" variant.
-          // Branding.
           label: "The basics",
           autogenerate: { directory: "the-basics" },
         },

@@ -1,0 +1,61 @@
+---
+title: The row object
+description: Come and learn about the heart of every table.
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
+
+import heroSql from "../../code-examples/hero/penguins.sql?raw";
+
+At the heart of every table module is the `row` object:
+
+<Tabs>
+  <TabItem label="row">
+    ```ts
+    export const row = z.object({
+      id: z.number().brand<"public.penguins.id">(),
+      name: z.string(),
+      species: z.string(),
+      waddle_speed_kph: z.number(),
+      favourite_snack: z.string().nullable(),
+      date_of_birth: z.date(),
+    });
+    ```
+  </TabItem>
+
+  <TabItem label="penguins.sql">
+    <Code
+      code={heroSql}
+      lang="sql"
+    />
+  </TabItem>
+</Tabs>
+
+
+The `row` serves 3 purposes:
+
+1. **Runtime validation**  
+   Every query that uses `sql.type(row)` is validated at runtime. If Postgres returns data that doesn't match this shape, you'll find out immediately.
+
+2. **Static typing**  
+   From this schema, we derive the `Row` type:
+
+   ```ts
+   export type Row = z.infer<typeof row>;
+   ```
+
+3. **Query composition**  
+   The same schema is reused to derive column lists:
+
+   ```ts
+   export const columns = Object.keys(row.shape).map((col) =>
+     sql.identifier([col]),
+   );
+
+   export const columnsFragment = sql.join(columns, sql.fragment`, `);
+   ```
+
+   You will see this used in lots of `no-orm`'s queries.
+

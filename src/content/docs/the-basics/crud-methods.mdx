@@ -1,0 +1,150 @@
+---
+title: CRUD methods
+description: How to actually interact with your database tables.
+sidebar:
+  order: 3
+---
+
+This is how you actually interact with your database tables. Each operation in this module follows a consistent pattern:
+
+- A **`*Many` function** that contains the SQL.
+- A **single-row wrapper** that delegates to it.
+
+Below is a list of methods that all tables will have.
+
+---
+
+## Create
+
+### `createMany`
+
+For creating many rows.
+
+```ts
+export async function createMany({
+  connection,
+  shapes,
+}: CreateManyArgs): Promise<readonly Row[]> {
+  // ...
+}
+```
+
+### `create`
+
+For creating 1 row.
+
+```ts
+export async function create({ connection, shape }: CreateArgs): Promise<Row> {
+  // ...
+}
+```
+
+---
+
+## Read
+
+### `getMany`
+
+For reading many rows.
+
+```ts
+export async function getMany({
+  connection,
+  ids,
+}: GetManyArgs): Promise<readonly Row[]> {
+  // ...
+}
+```
+
+### `get`
+
+For reading 1 row.
+
+```ts
+export async function get({ connection, id }: GetArgs): Promise<Row> {
+  // ...
+}
+```
+
+### `getManyMap`
+
+For when you want to fetch many rows but also efficiently access them later.
+
+See the penguin's [expandMany](https://github.com/william-coulter/no-orm-example-server/blob/main/src/database/penguins.ts#L15) for an example use-case.
+
+```ts
+export async function getManyMap(
+  { connection, ids }: GetManyArgs,
+): Promise<Map<Id, Row>> {
+  // ...
+}
+```
+---
+
+### Find
+
+The `find*` variants are just like `get*` but they accept **unbranded IDs**:
+
+```ts
+export async function find({ connection, id }: FindArgs): Promise<Row | null> {
+  // ...
+}
+```
+
+This is useful for accepting user input and validating that the data exists. Notice how they return `null`.
+
+---
+
+## Update
+
+### `updateMany`
+
+For updating many rows.
+
+```ts
+export function updateMany({
+  connection,
+  newRows,
+}: UpdateManyArgs): Promise<readonly Row[]> {
+  // ...
+}
+```
+
+### `update`
+
+For updating 1 row.
+
+```ts
+export async function update({ connection, newRow }: UpdateArgs): Promise<Row> {
+  // ...
+}
+```
+
+---
+
+## Delete
+
+### `deleteMany`
+
+For deleting many rows.
+
+```ts
+export async function deleteMany({
+  connection,
+  ids,
+}: DeleteManyArgs): Promise<void> {
+  // ...
+}
+```
+
+### `delete`
+
+For deleting 1 row.
+
+```ts
+async function _delete({ connection, id }: DeleteArgs): Promise<void> {
+  // ...
+}
+
+export { _delete as delete };
+```

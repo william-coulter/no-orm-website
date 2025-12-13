@@ -1,0 +1,36 @@
+---
+title: Branded primary keys
+description: Learn a bit about branding and why it is useful.
+sidebar:
+  order: 4
+---
+
+Notice the `id` column:
+
+```ts
+id: z.number().brand<"public.penguins.id">(),
+```
+
+This uses **Zod branding** to create a *nominal* type for your primary key.
+
+## What does that give you?
+
+```ts
+export type Id = Row["id"];
+```
+
+Now `Id` is **not just a `number`**. TypeScript will treat it as a distinct type:
+
+```ts
+function getPenguin(id: Id) {}
+function getZoo(id: ZooId) {}
+
+getPenguin(zooId); // Compiling error.
+```
+
+## Why this is useful
+
+The goal is to catch situations like this at compile time:
+- Passing the ID variable as an argument to the wrong table.
+- Passing user input where a database ID is expected.
+- Using raw numbers instead of validated identifiers.

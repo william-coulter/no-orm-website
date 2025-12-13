@@ -1,0 +1,20 @@
+---
+title: Type mapping
+description: Mapping from Postgres data types to Typescript.
+sidebar:
+  order: 6
+---
+
+How does `no-orm` map Postgres data types into Typescript types?
+
+## Mapping philosophy
+
+This project tries to make **sensible decisions** about type mapping.
+
+For example, a Postgres `TIMESTAMPTZ` type is has a microsecond precision whereas a Javascript `Date` object is only precise to the millisecond. Despite this, `no-orm` will map a `TIMESTAMPTZ` type to a Javascript `Date` object as an opinionated decision favouring practicality.
+
+## A full list of mappings
+
+We won't duplicate decisions made about type mapping in these docs.
+
+Instead, refer to the `no-orm` [source code](https://github.com/william-coulter/no-orm/blob/main/src/builders/mappers.ts). The mappings test [here](https://github.com/william-coulter/no-orm/blob/main/tests/test-type-parsing/schema.sql) will always show the current behaviour of how `no-orm` maps types.

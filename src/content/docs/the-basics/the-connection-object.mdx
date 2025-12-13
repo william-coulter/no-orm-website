@@ -1,0 +1,18 @@
+---
+title: The connection object
+description: A slonik Common Query Methods object.
+sidebar:
+  order: 5
+---
+
+Every method must be passed this object:
+
+```ts
+type BaseArgs = { connection: CommonQueryMethods };
+```
+
+This is a [Slonik type](https://github.com/gajus/slonik?tab=readme-ov-file#types) which represents a connection to your database.
+
+This type is the most generic of connections so it doesn't matter if the connection is from a connection pool, single connection or a transaction. The methods do not care.
+
+It is a bit of management to have to pass this in to every database operation.

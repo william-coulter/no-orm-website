@@ -1,0 +1,32 @@
+---
+title: Why index-first?
+description: Why does no-orm 
+sidebar:
+  order: 2
+---
+import { Image } from "astro:assets";
+
+import prosAndConsOfIndexSrc from "../../../assets/pros-and-cons-of-index.png";
+
+Why does `no-orm` enforce that you write an index before you can query by that column on a table?
+
+## Pros and cons of an index
+
+There are pros and cons of creating a database index.
+
+- **Pro (faster read times)**: Traversing a B-Tree has logarithmic time complexity compared to the tree size, so the benefit you receive from having this index is exponential.
+- **Con (Slower write times)**: Inserting a new element into a B-Tree has logarithmic time complexity so the cost paid to write-times due to this index is also logarithmic.
+- **Con (Storage):** Every new row in the table increases the B-Tree size by the same amount therefore this cost is linear.
+
+Below is a plot showing how the benefits and costs of an index change as a table grows.
+
+<div style="display:flex; justify-content:center;">
+  <Image
+    src={prosAndConsOfIndexSrc}
+    alt="Pros and cons of an index."
+  />
+</div>
+
+In most read-heavy applications, the pros outweigh the cons at all sizes of your table. So why would you not just add an index?
+
+This is why `no-orm` encourages you to think about your indexes before querying a table via that column.

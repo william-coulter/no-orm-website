@@ -1,0 +1,32 @@
+---
+title: An index-first approach
+description: Querying tables via other columns with no-orm.
+sidebar:
+  order: 1
+---
+
+import { Code } from "@astrojs/starlight/components"
+import flightAttemptsSql from "../../code-examples/flight-attempts/flight-attempts.sql?raw";
+
+So far we've only seen how to query a table based on its primary key. But what about querying by other columns?
+
+For example, what if wanted to query for all of the flight attempts relating to a penguin?
+
+<Code code={flightAttemptsSql} lang="sql" title="flight-attempts.sql" />
+
+## Use an index
+
+Creating a database index on this column will tell `no-orm` to generate a query on that column for you.
+
+```sql
+CREATE INDEX ON flight_attempts (penguin);
+```
+
+```ts
+export async function getByPenguin({
+  connection,
+  penguin,
+}: GetByPenguinArgs): Promise<readonly Row[]> {
+  // ...
+}
+```

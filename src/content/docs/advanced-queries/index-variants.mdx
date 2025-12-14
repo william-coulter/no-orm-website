@@ -1,0 +1,136 @@
+---
+title: Index variants
+description: How does no-orm handle certain types of indexes.
+sidebar:
+  order: 3
+---
+import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
+import penguinsSql from "../../code-examples/flight-attempts/penguins.sql?raw";
+import flightAttemptsSql from "../../code-examples/flight-attempts/flight-attempts.sql?raw";
+
+Below we will go over some variants of indexes and explain how `no-orm` will handle them.
+
+We will be looking at these tables.
+
+<Tabs>
+  <TabItem label="penguins.sql">
+    <Code
+      code={penguinsSql}
+      lang="sql"
+    />
+  </TabItem>
+
+  <TabItem label="flight-attempts.sql">
+    <Code
+      code={flightAttemptsSql}
+      lang="sql"
+    />
+  </TabItem>
+</Tabs>
+
+## Single column
+
+A single column index will generate the following:
+
+```sql
+CREATE INDEX ON flight_attempts (penguin);
+```
+
+A `getMany` function:
+
+```ts
+export async function getManyByPenguin({
+  connection,
+  columns, // List of penguin ids.
+}: GetManyByPenguinArgs): Promise<readonly Row[]> {
+  // ...
+}
+```
+
+A `get` function:
+
+```ts
+export async function getByPenguin({
+  connection,
+  penguin,
+}: GetByPenguinArgs): Promise<readonly Row[]> {
+  // ...
+}
+```
+
+A `getManyMap` function:
+
+```ts
+export async function getManyByPenguinMap({
+  connection,
+  columns,
+}: GetManyByPenguinArgs): Promise<Map<PenguinsRow["id"], Row[]>> {
+  // ...
+}
+```
+
+## Multi-column index
+
+```sql
+CREATE INDEX ON penguins (name, species);
+```
+
+This gives you the same functions as a single column index except the function arguments are tuples of the columns:
+
+```ts
+export type GetManyBySpeciesAndDateOfBirth = BaseArgs & {
+  columns: {
+    name: string;
+    species: string;
+  }[];
+};
+
+// ...
+```
+
+## Unique indexes
+
+Adding a `UNIQUE` constraint to your indexes changes some of the return types of the functions.
+
+```sql
+CREATE UNIQUE INDEX ON penguins (name);
+```
+
+The return type is `Row | null` rather than `Row[]`.
+
+```ts
+export async function getByName({
+  connection,
+  name,
+}: GetByNameArgs): Promise<Row | null> {
+  // ...
+}
+```
+
+## Partial indexes
+
+An index with a predicate, for example:
+
+```sql
+CREATE INDEX ON flight_attempts (failure_reason)
+WHERE failure_reason IS NOT NULL;
+```
+
+To leverage this index, your SQL query needs to include a `WHERE failure_reason IS NOT NULL` filter.
+
+`no-orm` is not smart enough to understand what SQL filter to create when generating code for partial indexes. As such, `no-orm` will ignore partial indexes when generating functions.
+
+To fully leverage partial indexes with predicates, you will have to hand-write your own SQL.
+
+## Functional indexes
+
+
+An index with a function applied to it, for example:
+
+```sql
+CREATE INDEX ON penguins (LOWER(name));
+```
+
+Similar to a partial index to leverage this index, your SQL needs to include a `WHERE LOWER(name) = ?` filter.
+
+Again, `no-orm` is not smart enough and so will ignore these indexes when generating code.

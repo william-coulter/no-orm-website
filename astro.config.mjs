@@ -26,10 +26,6 @@ export default defineConfig({
           autogenerate: { directory: "the-basics" },
         },
         {
-          // Querying on certain columns.
-          // Index-first approach. Why? (you always should index on a query pattern).
-          // Indexes changing the return type.
-          // You can write custom SQL if needed, but encouraged not to in no-orm. Example repo.
           label: "Advanced queries",
           autogenerate: { directory: "advanced-queries" },
         },

@@ -5,20 +5,59 @@ sidebar:
   order: 4
 ---
 
+import { Aside } from "@astrojs/starlight/components";
+
 Sometimes `no-orm` won't give you what you need. You can write your own SQL but `no-orm` has some opinions.
 
-## Prefer many, simple DB queries over a single complicated query
+## Prefer many, simple queries over a single, more complicated query
 
-You might be tempted to write something like this: STARTHERE:
+Imagine you want to write a query to fetch all of the flight attempts for penguins named 'George'.
 
-More maintainable. SQL is a hard language to write in. No static analysis.
+You might be tempted to write something like:
 
-Just do server-side joins.
+```ts
+const query = `
+  SELECT flight_attempts.*
+  FROM flight_attempts
+  JOIN penguins ON penguins.id = flight_attempts.penguin
+  WHERE penguins.name = ${name}`;
+```
 
-Better database performance - the query planner can handle it better. Yes it's another round trip but often your server and DB are in the same data center.
+Looks pretty simple. And a query like this is relatively simple.
 
+However in general, code and logic written in SQL queries is hard to maintain. You don't get a lot of the static analysis that comes from other programming languages.
 
-## When to write SQL
+The `no-orm` approach would be to split this into 2 separate queries:
+
+```ts
+const penguinsNamedGeorge = await Penguins.getByName({ connection, name: "George" });
+const flightAttempts = await PenguinFlightAttempts.getManyByPenguin({
+  connection,
+  penguins: penguinsNamedGeorge.map((p) => p.id)
+});
+```
+
+Yes it's another round trip to the database, however most of the time your server and database are running in the same data center, so it's a fast round trip.
+
+The query plan for the 2 simple queries is much simpler meaning your database will be happier.
+
+This approach means you get all of the maintainability from using `no-orm`'s generated functions.
+
+## Know your application
+
+The advice above should always be taken in the context of your application.
+
+Maybe your business has thousands of penguins named George and so storing all of them in a variable would cause your server to crash.
+
+Maybe your database and server are running in separate data centers so the cost of a round trip is high.
+
+Maybe you want a complex SQL query for 1 particular use-case.
+
+At the end of the day, **you are the expert on your application and should make these decisions as you see fit**.
+
+## Writing SQL
+
+As discussed, sometimes you do need to write SQL. An example of this is pagination:
 
 ```ts
 import * as PenguinFlightAttempts from "@no-orm/public/tables/penguin_flight_attempts";
@@ -43,3 +82,9 @@ export async function paginate({
   return connection.any(query);
 }
 ```
+
+Again, try to keep your SQL queries as simple as possible both for code maintainability but also database performance.
+
+<Aside type="tip">
+  If you find yourself always needing to write a lot of custom SQL, that's a strong sign to rethink your database schema to fit your use-case better.
+</Aside>

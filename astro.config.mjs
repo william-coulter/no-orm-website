@@ -30,11 +30,6 @@ export default defineConfig({
           autogenerate: { directory: "advanced-queries" },
         },
         {
-          // Do I need a full section? Maybe in basics.
-          label: "Foreign keys",
-          autogenerate: { directory: "foreign-keys" },
-        },
-        {
           // Discuss the custom serialisers.
           // You have to hand-write any check constraints.
           // Touch on no composite types.

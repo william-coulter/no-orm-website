@@ -25,7 +25,7 @@ Now `Id` is **not just a `number`**. TypeScript will treat it as a distinct type
 function getPenguin(id: Id) {}
 function getZoo(id: ZooId) {}
 
-getPenguin(zooId); // Compiling error.
+getPenguin(zooId); // Compilation error.
 ```
 
 ## Why this is useful
@@ -34,3 +34,15 @@ The goal is to catch situations like this at compile time:
 - Passing the ID variable as an argument to the wrong table.
 - Passing user input where a database ID is expected.
 - Using raw numbers instead of validated identifiers.
+
+## Foreign Keys
+
+If a table contains a foreign key reference, this is also branded on your row object.
+
+```ts title="flight_attempts.ts"
+export const row = z.object({
+  id: z.number().brand<"public.flight_attempts.id">(),
+  penguin: z.number().brand<"public.penguins.id">(),
+  // ...
+});
+```

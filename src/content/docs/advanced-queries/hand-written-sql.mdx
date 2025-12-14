@@ -1,0 +1,45 @@
+---
+title: Hand written SQL
+description: When to write your own SQL queries with no-orm.
+sidebar:
+  order: 4
+---
+
+Sometimes `no-orm` won't give you what you need. You can write your own SQL but `no-orm` has some opinions.
+
+## Prefer many, simple DB queries over a single complicated query
+
+You might be tempted to write something like this: STARTHERE:
+
+More maintainable. SQL is a hard language to write in. No static analysis.
+
+Just do server-side joins.
+
+Better database performance - the query planner can handle it better. Yes it's another round trip but often your server and DB are in the same data center.
+
+
+## When to write SQL
+
+```ts
+import * as PenguinFlightAttempts from "@no-orm/public/tables/penguin_flight_attempts";
+import * as Penguins from "@no-orm/public/tables/penguins";
+
+// ...
+
+export async function paginate({
+  connection,
+  penguin,
+  token,
+  limit,
+}: PaginateArgs): Promise<readonly PenguinFlightAttempts.Row[]> {
+  const query = sql.type(PenguinFlightAttempts.row)`
+    SELECT ${PenguinFlightAttempts.columnsFragment}
+    FROM ${PenguinFlightAttempts.tableFragment}
+    WHERE penguin = ${penguin}
+      AND ${token ? sql.fragment`id > ${token}` : sql.fragment`TRUE`}
+    ORDER BY id
+    LIMIT ${limit}`;
+
+  return connection.any(query);
+}
+```

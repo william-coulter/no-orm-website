@@ -1,0 +1,64 @@
+---
+title: Enums
+description: Taking a look at how `no-orm` handles Postgres Enumerated Types.
+sidebar:
+  order: 2
+---
+import { Tabs, TabItem, Code, FileTree } from "@astrojs/starlight/components";
+
+Creating a [Postgres Enumerated Type](https://www.postgresql.org/docs/current/datatype-enum.html) in your schema will add this data type to your `enums` directory.
+
+
+```sql
+CREATE TYPE penguin_flight_attempt_method AS ENUM (
+  'glider',
+  'ski_jump',
+  'jet_pack',
+  'catapult',
+  'trampoline',
+  'rocket',
+  'giant_sling',
+  'balloon'
+);
+```
+
+<FileTree>
+
+- no-orm
+  - public
+    - **enums**
+      - schemas.ts
+      - types.ts
+
+</FileTree>
+
+This generates a Zod schema which can parse the enum from your database:
+
+<Tabs>
+  <TabItem label="schemas.ts">
+    ```ts
+    export const penguinFlightAttemptMethod = z.union([
+      z.literal("glider"),
+      z.literal("ski_jump"),
+      z.literal("jet_pack"),
+      z.literal("catapult"),
+      z.literal("trampoline"),
+      z.literal("rocket"),
+      z.literal("giant_sling"),
+      z.literal("balloon"),
+    ]);
+    ```
+  </TabItem>
+
+  <TabItem label="types.ts">
+    ```ts
+    import * as Schemas from "./schemas";
+
+    export type PenguinFlightAttemptMethod = z.infer<
+      typeof Schemas.penguinFlightAttemptMethod
+    >;
+    ```
+  </TabItem>
+</Tabs>
+
+Note that `enums` are scoped on a per-schema level (e.g `public`).

@@ -2,7 +2,7 @@
 title: Type mapping
 description: Mapping from Postgres data types to Typescript.
 sidebar:
-  order: 6
+  order: 1
 ---
 
 How does `no-orm` map Postgres data types into Typescript types?
@@ -15,8 +15,6 @@ For example, a Postgres `TIMESTAMPTZ` type is has a microsecond precision wherea
 
 ## A full list of mappings
 
-We won't duplicate decisions made about type mapping in these docs.
+We won't duplicate decisions made about every type in these docs. Instead, refer to the `no-orm` [source code](https://github.com/william-coulter/no-orm/blob/main/src/builders/mappers.ts). The mappings test [here](https://github.com/william-coulter/no-orm/blob/main/tests/test-type-parsing/schema.sql) will always show the current behaviour of how `no-orm` maps types.
 
-Instead, refer to the `no-orm` [source code](https://github.com/william-coulter/no-orm/blob/main/src/builders/mappers.ts). The mappings test [here](https://github.com/william-coulter/no-orm/blob/main/tests/test-type-parsing/schema.sql) will always show the current behaviour of how `no-orm` maps types.
-
-{/* TODO: Something about enum, ranges and domains? */}
+We will however document how `no-orm` behaves with more complex data types.

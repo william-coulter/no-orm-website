@@ -1,0 +1,72 @@
+---
+title: Domains
+description: Taking a look at how `no-orm` handles Postgres Domain Types.
+sidebar:
+  order: 3
+---
+import { Tabs, TabItem, Code, FileTree } from "@astrojs/starlight/components";
+
+Creating a [Postgres Domain Type](https://www.postgresql.org/docs/current/domains.html) in your schema will add this data type to your `domains` directory.
+
+```sql
+CREATE DOMAIN TEXT_SHORT AS TEXT
+   CONSTRAINT check_length
+   CHECK (LENGTH(value) <= 255);
+```
+
+<FileTree>
+
+- no-orm
+  - public
+    - **domains**
+      - schemas.ts
+      - types.ts
+
+</FileTree>
+
+This generates a Zod schema which can parse the enum from your database:
+
+<Tabs>
+  <TabItem label="schemas.ts">
+    ```ts
+    export const textShort = z.string().brand<"public.domains.text_short">();
+    ```
+  </TabItem>
+
+  <TabItem label="types.ts">
+    ```ts
+    import * as Schemas from "./schemas";
+
+    export type TextShort = z.infer<typeof Schemas.textShort>;
+    ```
+  </TabItem>
+</Tabs>
+
+Note that `domains` are scoped on a per-schema level (e.g `public`).
+
+## Validating domains
+
+You might have noticed that even though the domain data type enforces that the string is `<= 255` characters, the `no-orm` generated Zod schema does not do this.
+
+**`no-orm` is not that smart.**
+
+Instead, you have to write your own Zod schemas to validate input before it can be written to the database:
+
+```ts
+import * as Domains from "@no-orm/public/domains";
+import { z } from "zod";
+
+export const schema = z.string().max(255).pipe(Domains.Schemas.textShort);
+
+...
+
+export const createPenguinRequestBody = z.object({
+  name: z.string().pipe(Schemas.TextShort.schema),
+  ...
+)};
+...
+```
+
+Creating a row in a table that uses the `TEXT_SHORT` data type will give you a Typescript compiling error unless it is first parsed into a branded `TextShort` type.
+
+You can see this being used in the example server [here](https://github.com/william-coulter/no-orm-example-server/blob/3fe0c03a3c7236087a950961d6465db17610fc3b/src/schemas/text-short.ts#L4).

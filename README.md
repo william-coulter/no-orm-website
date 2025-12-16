@@ -2,7 +2,7 @@
 
 ![No ORM Logo](./src/assets/logo.webp)
 
-This repository contains the docs for the `no-orm` project.
+This repository contains the docs for the [no-orm](https://github.com/william-coulter/no-orm) project.
 
 # Starlight
 

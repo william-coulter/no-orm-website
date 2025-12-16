@@ -26,7 +26,7 @@ import {
 import ormPhilosophyOverviewSrc from "../../assets/orm-philosophy-overview.webp";
 import noOrmPhilosophyOverviewSrc from "../../assets/no-orm-philosophy-overview.webp";
 import penguinsSql from "../code-examples/hero/penguins.sql?raw";
-import tableTs from "../code-examples/hero/table.ts?raw";
+import tableTs from "../code-examples/hero/table-truncated.ts?raw";
 
 # No ORM in 3 steps
 
@@ -43,8 +43,7 @@ import tableTs from "../code-examples/hero/table.ts?raw";
    ```
 
 3. Enjoy generated code in your Typescript server!
-
-   {/* TODO: Give these a max-height so that they scroll. */}
+   {/* TODO: use the `heroTableTs` import and add a `max-height` so that we don't have to truncate. */}
    <Code
      code={tableTs}
      lang="typescript"

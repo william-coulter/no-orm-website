@@ -1,0 +1,26 @@
+---
+title: Slonik setup
+description: How to initialise Slonik in you server
+sidebar:
+  order: 2
+---
+
+## Required type parsers
+
+If you are using `no-orm`, there is some additional setup you must provide in your Slonik [client configuration](https://github.com/gajus/slonik?tab=readme-ov-file#api).
+
+```ts
+import { requiredTypeParsers } from "@no-orm/slonik/type-parsers";
+import {
+  createPool,
+  createTypeParserPreset,
+} from "slonik";
+
+const pool = await createPool("database url", {
+  // Copied from: https://github.com/gajus/slonik?tab=readme-ov-file#result-parser-interceptor
+  interceptors: [createResultParserInterceptor()],
+  typeParsers: [...createTypeParserPreset(), ...requiredTypeParsers],
+});
+```
+
+The `requiredTypeParsers` ensure that certain Postgres types are mapped to Typescript objects that `no-orm` expects. Some of these decisions are opinionated. Read more here.

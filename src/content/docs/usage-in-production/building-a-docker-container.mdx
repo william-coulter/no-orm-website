@@ -1,0 +1,24 @@
+---
+title: Building a docker container
+description: An example docker container
+sidebar:
+  order: 2
+---
+
+## Building a Docker container
+
+You can see an example script in the example server [here](https://github.com/william-coulter/no-orm-example-server/blob/main/ci/build.sh) which builds a Docker container. 
+
+The script runs `no-orm generate` and then the [Dockerfile](https://github.com/william-coulter/no-orm-example-server/blob/main/Dockerfile) copies these across. You can also make the `Dockerfile` run `no-orm generate`.
+
+## Deployment
+
+This script and Dockerfile can then be run in a CI pipeline to publish to a container registry.
+
+Once the image is in the container registry, it can be run in a test suite and eventually in a production environment.
+
+## Do not commit `no-orm` code
+
+This should be generated in every instance of your server.
+
+Note that if there is database schema drift between your local setup and a production environment, you will likely get runtime errors in your server.

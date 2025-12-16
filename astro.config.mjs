@@ -34,7 +34,6 @@ export default defineConfig({
           autogenerate: { directory: "advanced-types" },
         },
         {
-          // Basically copy / paste. Maybe use AI.
           label: "The config file",
           autogenerate: { directory: "the-config-file" },
         },

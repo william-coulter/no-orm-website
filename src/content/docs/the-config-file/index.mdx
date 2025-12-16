@@ -1,0 +1,116 @@
+---
+title: The config file
+description: Details on how the `no-orm` config file can be used.
+sidebar:
+  order: 1
+---
+
+## Overview
+
+The `no-orm` config file can be used to customise:
+ - The database being used to generate code.
+ - Where `no-orm` code is written.
+ - How certain schemas, tables and columns are read / ignored.
+
+## `NoOrmConfig`
+
+This is the `NoOrmConfig` top level object:
+
+```ts
+export type NoOrmConfig = {
+  /**
+   * A Postgres connection string that `no-orm` will read from to generate outputs.
+   *
+   * Default: `postgres://postgres:postgres@localhost:5432/postgres`.
+   */
+  readonly postgres_connection_string?: string;
+
+  /**
+   * The directory where `no-orm` will save its generated outputs.
+   *
+   * Default: `no-orm`.
+   */
+  readonly output_directory?: string;
+
+  /**
+   * Define custom behaviour for how `no-orm` reads your database schema.
+   *
+   * Default: The `no-orm` default options will be applied to every schema.
+   */
+  readonly database_schema_config?: DatabaseSchemaConfig;
+};
+```
+
+### Database Schema Config
+
+This is config about how your database is read.
+
+Each schema, table and column can be ignored with `ignore: true`.
+
+There are also additional options to be applied on a `table` and `column` level:
+
+```ts
+export type TableConfig = Ignorable<{
+  /**
+   * A map of column names to the column's config.
+   */
+  column_configs: Record<string, ColumnConfig>;
+  /**
+   * If `true`, the table will treat `created_at` and `updated_at` as readonly.
+   *
+   * Default: `true`.
+   */
+  readonly_time_columns?: boolean;
+}>;
+```
+
+Note that by default, `created_at` and `updated_at` columns are treated as `readonly`. As in, they will appear in a row that you have read however they are not required in creating or updating a row in that table.
+
+```ts
+export type ColumnConfig = {
+  /**
+   * If `true`, the column will not be used in `create` or `update` operations. The
+   * column will still exist on the `Row` data type. Ensure `readonly` columns are
+   * `NOT NULL` and have a default value.
+   *
+   * Default: `false`.
+   */
+  readonly?: boolean;
+
+  /**
+   * If `true`, the column will be ignored by `no-orm` completely. It will not appear
+   * in any data types however will still exist on the underlying Postgres schema.
+   * This is useful for dropping columns.
+   *
+   * Default: `false`.
+   */
+  ignore?: boolean;
+};
+```
+
+## Example usage
+
+```ts title="no-orm.config.ts"
+import type { NoOrmConfig } from "no-orm";
+
+const config: NoOrmConfig = {
+  database_schema_config: {
+    schema_configs: {
+      public: {
+        table_configs: {
+          penguins: {
+            column_configs: {
+              ignore_column: { ignore: true },
+            },
+          },
+          ignore_table: { ignore: true },
+        },
+      },
+    },
+  },
+};
+
+export default config;
+```
+
+Note that the config is typed and has intellisense to help you know what options you can use.

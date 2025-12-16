@@ -54,10 +54,6 @@ export default defineConfig({
           autogenerate: { directory: "similar-projects" },
         },
         {
-          // If there is something missing from the docs:
-          // - Read the source code.
-          // - Try `no-orm` out in your example scenario.
-          // - Submit an issue on `no-orm` Github.
           label: "Missing something?",
           autogenerate: { directory: "missing-something" },
         },

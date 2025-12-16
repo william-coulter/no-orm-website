@@ -42,7 +42,6 @@ export default defineConfig({
           autogenerate: { directory: "usage-in-production" },
         },
         {
-          // Is this also like "best practices?"
           label: "Example server",
           autogenerate: { directory: "example-server" },
         },

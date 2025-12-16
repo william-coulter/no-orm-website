@@ -28,7 +28,7 @@ import noOrmPhilosophyOverviewSrc from "../../assets/no-orm-philosophy-overview.
 import penguinsSql from "../code-examples/hero/penguins.sql?raw";
 import tableTs from "../code-examples/hero/table-truncated.ts?raw";
 
-# No ORM in 3 steps
+# `no-orm` in 3 steps
 
 <Steps>
 
@@ -59,13 +59,13 @@ Or... Keep reading!
 
 # Motivation
 
-At No ORM, we believe you should be able to build a server without having to learn an ORM abstraction.
+At `no-orm, we believe you should be able to build a server without having to learn an ORM abstraction.
 
 Abstractions work by hiding implementation details which makes using your database simpler, but also harder to understand and deeply configure. **You gain simplicity but lose control**.
 
-Our opinion is that PostgreSQL is already a great abstraction. Adding another layer on top often just obscures what your database is doing and increasing the likelihood to make poor database design decisions.
+Our opinion is that when you are writing a server, you want to be as close to the database as possible. Adding another layer on top often just obscures what your database is doing and increasing the likelihood to make poor database design decisions.
 
-We recognise however that ORMs do have their benefits however, so **the motivation of `No ORM` is to capture all of the best bits of an ORM while also preserving what makes PostgreSQL so great.**
+We recognise however that ORMs do have their benefits however, so **the motivation of `no-orm` is to capture all of the best bits of an ORM while also preserving what makes PostgreSQL so great.**
 
 # Philosophy
 
@@ -81,7 +81,7 @@ With a traditional ORM, you start by defining your entities and the ORM will gen
   />
 </div>
 
-With `No ORM`, you start by defining your schema and **we give you your entities**!
+With `no-orm`, you start by defining your schema and **we give you your entities**!
 
 <div style="display:flex; justify-content:center;">
   <Image
@@ -107,13 +107,4 @@ Maybe you're not familiar with SQL and prefer the abstraction. Maybe you believe
 
 That is completely understandable and if so, this tool **probably isn't for you**!
 
-{/* This gives you complete control over your schema without having to think _"does my ORM support this?"_ and still hands you all the boiler-plate entities and access patterns. */}
-
-{/* TODO: Do I add something like this? */}
-{/* ## Why schema first? */}
-{/* By defining the schema using the ORM's abstraction, you lose so much control over what your schema can do. An ORM is written for your application code so features in PostgreSQL that your application doesn't need to know about but are amazing features to use are left out.
-Starting with your schema first means that you can _/}
-{/* ORM schema abstractions miss features like [deferred constraint triggers](https://www.postgresql.org/docs/9.0/sql-createconstraint.html)... */}
-
-{/* TODO: Like what you see? Get started link. */}
-{/* TODO: Full API example, once this is built. */}
+<LinkButton href="/get-started/" icon="external">Get started</LinkButton>

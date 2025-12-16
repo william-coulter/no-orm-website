@@ -30,10 +30,6 @@ export default defineConfig({
           autogenerate: { directory: "advanced-queries" },
         },
         {
-          // Discuss the custom serialisers.
-          // You have to hand-write any check constraints.
-          // Touch on no composite types.
-          // Not everything is documented, try it out and see what happens.
           label: "Advanced types",
           autogenerate: { directory: "advanced-types" },
         },

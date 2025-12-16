@@ -1,0 +1,33 @@
+---
+title: Intervals
+description: Taking a look at how `no-orm` handles Postgres Interval Types.
+sidebar:
+  order: 5
+---
+import { Tabs, TabItem, Code, FileTree } from "@astrojs/starlight/components";
+
+A [Postgres Interval Type](https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-INTERVAL-INPUT) is handled by `no-orm` by using the [postgres-interval](https://github.com/bendrucker/postgres-interval) npm package.
+
+```sql
+CREATE TABLE ... (
+    -- ...
+    a_interval INTERVAL NOT NULL,
+    -- ...
+);
+```
+
+You can create an `interval` to be added as a column using `postgres-interval`:
+
+```ts
+import { default as parseInterval } from "postgres-interval";
+
+const interval = parseInterval("1 year 2 mons 3 days 04:05:06");
+```
+
+Then a row being read with an `interval` column has access to the `IPostgresInterval` interface:
+
+```ts
+import type { IPostgresInterval } from "postgres-interval";
+
+const interval: IPostgresInterval = row.a_interval; // { days: number; hours: number ... }
+```

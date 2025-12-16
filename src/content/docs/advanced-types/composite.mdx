@@ -1,0 +1,27 @@
+---
+title: Composite
+description: Taking a look at how `no-orm` handles Postgres Composite Types.
+sidebar:
+  order: 6
+---
+import { Tabs, TabItem, Code, FileTree } from "@astrojs/starlight/components";
+
+## Not supported
+
+Any table that references a [Postgres Composite Type](https://www.postgresql.org/docs/current/rowtypes.html) will be ignored.
+
+```sql
+CREATE TYPE inventory_item AS (
+  name            text,
+  supplier_id     integer,
+  price           numeric
+);
+
+CREATE TABLE ... (
+  -- ...
+  item inventory_item,
+  -- ...
+);
+```
+
+`no-orm generate` will print a warning when it comes across a composite type.

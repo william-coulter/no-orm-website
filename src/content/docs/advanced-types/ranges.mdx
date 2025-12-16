@@ -1,0 +1,102 @@
+---
+title: Ranges
+description: Taking a look at how `no-orm` handles Postgres Range Types.
+sidebar:
+  order: 4
+---
+import { Tabs, TabItem, Code, FileTree } from "@astrojs/starlight/components";
+
+Creating a [Postgres Range Type](https://www.postgresql.org/docs/current/rangetypes.html) in your schema will add this data type to your `ranges` directory.
+
+```sql
+-- Built-in.
+CREATE TABLE ... (
+  a_tstzrange TSTZRANGE NOT NULL,
+  -- ...
+);
+
+-- Custom.
+CREATE TYPE float_range AS RANGE (
+  subtype = float8,
+  subtype_diff = float8mi
+);
+```
+
+<FileTree>
+
+- no-orm
+  - public
+    - **ranges**
+      - schemas.ts
+      - types.ts
+
+</FileTree>
+
+This generates a Zod schema which can parse the enum from your database:
+
+<Tabs>
+  <TabItem label="schemas.ts">
+    ```ts
+    export const floatRange = z.string().brand<"public.ranges.float_range">();
+    ```
+  </TabItem>
+
+  <TabItem label="types.ts">
+    ```ts
+    import * as Schemas from "./schemas";
+
+    export type FloatRange = z.infer<typeof Schemas.floatRange>;
+    ```
+  </TabItem>
+</Tabs>
+
+Note that `ranges` are scoped on a per-schema level (e.g `public`).
+
+## Validating ranges
+
+### Built-in Postgres ranges
+
+`no-orm` has support for Postgres [built-in ranges](https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN). This uses the [postgres-range](https://github.com/martianboy/postgres-range) package.
+
+```ts
+import { Range } from "postgres-range";
+
+const tstzRange = new Range<Date>(
+  new Date("2025-01-01 00:00:00+10"),
+  new Date("2025-01-02 00:00:00+10"),
+  4,
+);
+```
+
+You can then pass `tstzRange` into a `no-orm` create or update method and know that your database will accept and store it correctly.
+
+Likewise when reading a `range`, it will come back in the `Range` type:
+
+```ts
+const tstzRange = row.a_tstz_range; // Range<Date>
+```
+
+You can see these ranges defined in the `postgres` directory of `no-orm`:
+
+<FileTree>
+
+- no-orm
+  - **postgres**
+    - schemas.ts
+    - types.ts
+
+</FileTree>
+
+### Custom defined ranges (e.g `float_range`)
+
+For custom defined ranges, `no-orm` will basically treat these like a `string` with some extra branding.
+
+Similar to `domains`, any custom range defined in your schema must be manually validated.
+
+In its simplest form, this can be done with zod parsing:
+
+```ts
+import * as Ranges from "./expected/public/ranges";
+
+const floatRange = Ranges.Schemas.floatRange.parse("[1.0,5.0)")
+```

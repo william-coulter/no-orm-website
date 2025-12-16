@@ -46,7 +46,6 @@ export default defineConfig({
           autogenerate: { directory: "example-server" },
         },
         {
-          // Limitations.
           label: "Limitations",
           autogenerate: { directory: "limitations" },
         },

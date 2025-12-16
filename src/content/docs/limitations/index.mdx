@@ -1,13 +1,40 @@
 ---
 title: Limitations
 description: A list of Postgres features that no-orm does not support.
-draft: true
 ---
 
-- No `VIEW` support.
-- No materialised views support.
-- No foreign table support.
-- Tables with [Composite Type](https://www.postgresql.org/docs/current/rowtypes.html) columns.
-- No automatic support for indexes with predicates (e.g `WHERE x IS NOT NULL`). This is because I need some way to convert the predicate into a Typescript type. Not worth it.
-- No automatic support for functional indexes (e.g `LOWER(x)`).
-- Assumed schema isolation: user-defined objects in schema "a" are not used in schema "b".
+A list of Postgres features that `no-orm` does officially not support.
+
+## Views
+
+A [Postgres View](https://www.postgresql.org/docs/current/tutorial-views.html) will be ignored from `no-orm`. Just use tables instead - storage is relatively cheap these days.
+
+## Materialised views
+
+A [Postgres Materialised View](https://www.postgresql.org/docs/current/rules-materializedviews.html) will be ignored from `no-orm`.
+
+## Assumed schema isolation
+
+A table in schema `a` cannot be referenced in a table from schema `b` and vice-versa:
+
+```sql
+CREATE TABLE a.table (
+  -- ...
+  b_reference REFERENCES b.table(id),
+  -- ...
+);
+```
+
+Also user-defined objects (`enums`, `ranges` etc) cannot be used across schemas.
+
+## Composite Types
+
+A table with a [Composite Type](https://www.postgresql.org/docs/current/rowtypes.html) will be ignored. As discussed [here](/advanced-types/composite/).
+
+## Partial indexes
+
+An index with a predicate will be ignored. As discussed [here](/advanced-queries/index-variants/#partial-indexes).
+
+## Functional indexes
+
+An index with a predicate will be ignored. As discussed [here](/advanced-queries/index-variants/#functional-indexes).

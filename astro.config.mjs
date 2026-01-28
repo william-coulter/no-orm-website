@@ -5,10 +5,12 @@ import starlightThemeRapide from "starlight-theme-rapide";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://no-orm.com",
   integrations: [
     starlight({
       plugins: [starlightThemeRapide()],
-      title: "No ORM",
+      title: "no-orm-cli",
+      description: "Documentation for no-orm-cli (npm). Generate type-safe Slonik/Zod interfaces and access patterns from your PostgreSQL schema.",
       social: [
         {
           icon: "github",
